@@ -1,0 +1,56 @@
+{
+  "kind": "collectionType",
+  "collectionName": "contact_submissions",
+  "info": {
+    "singularName": "contact-submission",
+    "pluralName": "contact-submissions",
+    "displayName": "Contact Submission",
+    "description": "Store website contact form submissions"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "fullName": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "required": true
+    },
+    "businessName": {
+      "type": "string",
+      "required": true
+    },
+    "jobTitle": {
+      "type": "string",
+      "required": true
+    },
+    "location": {
+      "type": "string",
+      "required": true
+    },
+    "helpRequest": {
+      "type": "text",
+      "required": true
+    },
+    "referral": {
+      "type": "string",
+      "required": true
+    },
+    "consent": {
+      "type": "boolean",
+      "required": true
+    },
+    "encryptedPayload": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

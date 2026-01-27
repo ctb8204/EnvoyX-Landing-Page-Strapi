@@ -40,6 +40,20 @@ Strapi gives you many possible deployment options for your project including [St
 yarn strapi deploy
 ```
 
+## 🛠️ Admin notes (Contact + Preview)
+
+### Contact recipients (contact-settings single type)
+- Field: `recipients`
+- Format: comma-separated list of email addresses
+  - Example: `edwin@tryenvoyx.com, ops@tryenvoyx.com`
+  - Whitespace is allowed; it will be trimmed at send time.
+- You can add/remove recipients in the Strapi admin UI without code changes.
+
+### Preview enablement
+- Strapi Cloud: enable **Preview** in the admin panel and set the preview URL + secret.
+- Local preview (free tier friendly): run Strapi locally and point the landing app’s
+  `STRAPI_URL` to your local instance for testing.
+
 ## 📚 Learn more
 
 - [Resource center](https://strapi.io/resource-center) - Strapi resource center.

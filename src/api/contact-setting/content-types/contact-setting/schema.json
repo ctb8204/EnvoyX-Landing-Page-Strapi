@@ -1,0 +1,21 @@
+{
+  "kind": "singleType",
+  "collectionName": "contact_settings",
+  "info": {
+    "singularName": "contact-setting",
+    "pluralName": "contact-settings",
+    "displayName": "Contact Settings",
+    "description": "Manage contact form notification settings"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "recipients": {
+      "type": "text",
+      "required": true,
+      "default": "edwin@tryenvoyx.com"
+    }
+  }
+}
