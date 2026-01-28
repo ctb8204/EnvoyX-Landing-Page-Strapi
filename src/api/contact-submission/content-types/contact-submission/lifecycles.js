@@ -1,4 +1,52 @@
+const crypto = require('node:crypto')
+
 const DEFAULT_RECIPIENT = 'edwin@tryenvoyx.com'
+const ALGORITHM = 'aes-256-gcm'
+const IV_LENGTH = 12
+
+const getKey = () => {
+  const rawKey = process.env.CONTACT_ENCRYPTION_KEY || process.env.ENCRYPTION_KEY
+  if (!rawKey) return null
+  const key = Buffer.from(rawKey, 'base64')
+  if (key.length !== 32) return null
+  return key
+}
+
+const encryptString = (value) => {
+  const key = getKey()
+  if (!key) {
+    return Buffer.from(value).toString('base64')
+  }
+
+  const iv = crypto.randomBytes(IV_LENGTH)
+  const cipher = crypto.createCipheriv(ALGORITHM, key, iv)
+  const encrypted = Buffer.concat([cipher.update(value, 'utf8'), cipher.final()])
+  const tag = cipher.getAuthTag()
+
+  const payload = {
+    iv: iv.toString('base64'),
+    tag: tag.toString('base64'),
+    data: encrypted.toString('base64')
+  }
+
+  return Buffer.from(JSON.stringify(payload)).toString('base64')
+}
+
+const buildFallbackPayload = (data) =>
+  JSON.stringify({
+    source: 'admin',
+    createdAt: new Date().toISOString(),
+    data: {
+      fullName: data.fullName ?? null,
+      email: data.email ?? null,
+      phone: data.phone ?? null
+    }
+  })
+
+const ensureEncryptedPayload = (data) => {
+  if (data.encryptedPayload) return
+  data.encryptedPayload = encryptString(buildFallbackPayload(data))
+}
 
 const parseRecipients = (value) => {
   if (!value) {
@@ -28,6 +76,12 @@ const loadRecipients = async () => {
 }
 
 module.exports = {
+  beforeCreate(event) {
+    ensureEncryptedPayload(event.params.data)
+  },
+  beforeUpdate(event) {
+    ensureEncryptedPayload(event.params.data)
+  },
   async afterCreate(event) {
     const { result } = event
     const emailService = strapi.plugin('email')?.service('email')
