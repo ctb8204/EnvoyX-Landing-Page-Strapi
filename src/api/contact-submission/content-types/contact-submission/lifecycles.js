@@ -64,12 +64,10 @@ const parseRecipients = (value) => {
 }
 
 const loadRecipients = async () => {
-  const settings = await strapi.entityService.findMany(
-    'api::contact-setting.contact-setting',
-    { limit: 1 }
-  )
+  const record = await strapi
+    .documents('api::contact-setting.contact-setting')
+    .findFirst({ fields: ['recipients'] })
 
-  const record = Array.isArray(settings) ? settings[0] : settings
   const recipients = parseRecipients(record?.recipients)
 
   return recipients.length ? recipients : [DEFAULT_RECIPIENT]
@@ -106,11 +104,19 @@ module.exports = {
       `Consent: ${result.consent ? 'Yes' : 'No'}`
     ]
 
-    await emailService.send({
-      to: recipients,
-      subject,
-      text: lines.join('\n'),
-      replyTo: result.email
-    })
+    try {
+      await emailService.send({
+        to: recipients,
+        subject,
+        text: lines.join('\n'),
+        replyTo: result.email
+      })
+    } catch (error) {
+      const details =
+        error && typeof error === 'object' && 'message' in error
+          ? error.message
+          : 'Unknown email error'
+      strapi.log.error(`Failed to send contact email: ${details}`)
+    }
   }
 }
