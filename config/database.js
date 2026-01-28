@@ -2,6 +2,24 @@ const path = require('path');
 
 module.exports = ({ env }) => {
   const client = env('DATABASE_CLIENT', 'sqlite');
+  const isProd = env('NODE_ENV') === 'production';
+  const sqliteFilename = path.join(__dirname, '..', env('DATABASE_FILENAME', '.tmp/data.db'));
+
+  if (!isProd) {
+    if (client === 'sqlite') {
+      console.log('[DB]', { client, filename: sqliteFilename });
+    } else {
+      console.log('[DB]', {
+        client,
+        host: env('DATABASE_HOST', 'localhost'),
+        port: env.int(
+          'DATABASE_PORT',
+          client === 'postgres' ? 5432 : 3306
+        ),
+        database: env('DATABASE_NAME', 'strapi'),
+      });
+    }
+  }
 
   const connections = {
     mysql: {
@@ -44,9 +62,10 @@ module.exports = ({ env }) => {
     },
     sqlite: {
       connection: {
-        filename: path.join(__dirname, '..', env('DATABASE_FILENAME', '.tmp/data.db')),
+        filename: sqliteFilename,
       },
       useNullAsDefault: true,
+      pool: { min: env.int('DATABASE_POOL_MIN', 1), max: env.int('DATABASE_POOL_MAX', 1) },
     },
   };
 

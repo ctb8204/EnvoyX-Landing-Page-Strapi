@@ -80,43 +80,58 @@ module.exports = {
   beforeUpdate(event) {
     ensureEncryptedPayload(event.params.data)
   },
-  async afterCreate(event) {
-    const { result } = event
-    const emailService = strapi.plugin('email')?.service('email')
+  afterCreate(event) {
+    scheduleContactEmail(event.result)
+  }
+}
 
-    if (!emailService) {
-      strapi.log.error('Email plugin is not configured. Cannot send contact email.')
-      return
-    }
+const sendContactEmail = async (result) => {
+  const emailService = strapi.plugin('email')?.service('email')
 
-    const recipients = await loadRecipients()
-    const subject = `New Contact Submission — ${result.fullName}`
+  if (!emailService) {
+    strapi.log.error('Email plugin is not configured. Cannot send contact email.')
+    return
+  }
 
-    const lines = [
-      `Full Name: ${result.fullName}`,
-      `Email: ${result.email}`,
-      `Phone: ${result.phone}`,
-      `Business Name: ${result.businessName}`,
-      `Job Title: ${result.jobTitle}`,
-      `Location: ${result.location}`,
-      `How can we help?: ${result.helpRequest}`,
-      `Referral: ${result.referral}`,
-      `Consent: ${result.consent ? 'Yes' : 'No'}`
-    ]
+  const recipients = await loadRecipients()
+  const subject = `New Contact Submission — ${result.fullName}`
 
-    try {
-      await emailService.send({
-        to: recipients,
-        subject,
-        text: lines.join('\n'),
-        replyTo: result.email
-      })
-    } catch (error) {
+  const lines = [
+    `Full Name: ${result.fullName}`,
+    `Email: ${result.email}`,
+    `Phone: ${result.phone}`,
+    `Business Name: ${result.businessName}`,
+    `Job Title: ${result.jobTitle}`,
+    `Location: ${result.location}`,
+    `How can we help?: ${result.helpRequest}`,
+    `Referral: ${result.referral}`,
+    `Consent: ${result.consent ? 'Yes' : 'No'}`
+  ]
+
+  try {
+    await emailService.send({
+      to: recipients,
+      subject,
+      text: lines.join('\n'),
+      replyTo: result.email
+    })
+  } catch (error) {
+    const details =
+      error && typeof error === 'object' && 'message' in error
+        ? error.message
+        : 'Unknown email error'
+    strapi.log.error(`Failed to send contact email: ${details}`)
+  }
+}
+
+const scheduleContactEmail = (result) => {
+  setImmediate(() => {
+    sendContactEmail(result).catch((error) => {
       const details =
         error && typeof error === 'object' && 'message' in error
           ? error.message
           : 'Unknown email error'
-      strapi.log.error(`Failed to send contact email: ${details}`)
-    }
-  }
+      strapi.log.error(`Failed to schedule contact email: ${details}`)
+    })
+  })
 }
