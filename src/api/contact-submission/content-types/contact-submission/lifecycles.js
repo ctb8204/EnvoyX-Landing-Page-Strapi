@@ -120,8 +120,8 @@ const sendContactEmail = async (result) => {
     })
   } catch (error) {
     const details =
-      error && typeof error === 'object' && 'message' in error
-        ? error.message
+      error && typeof error === 'object'
+        ? (error.response && error.response.data) || error.message || 'Unknown email error'
         : 'Unknown email error'
     strapi.log.error(`Failed to send contact email: ${details}`)
   }
@@ -131,8 +131,8 @@ const scheduleContactEmail = (result) => {
   setImmediate(() => {
     sendContactEmail(result).catch((error) => {
       const details =
-        error && typeof error === 'object' && 'message' in error
-          ? error.message
+        error && typeof error === 'object'
+          ? (error.response && error.response.data) || error.message || 'Unknown email error'
           : 'Unknown email error'
       strapi.log.error(`Failed to schedule contact email: ${details}`)
     })
