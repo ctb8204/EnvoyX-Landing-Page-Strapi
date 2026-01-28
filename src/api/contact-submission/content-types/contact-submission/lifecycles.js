@@ -1,6 +1,6 @@
 const crypto = require('node:crypto')
 
-//const DEFAULT_RECIPIENT = 'edwin@tryenvoyx.com'
+const DEFAULT_RECIPIENT = 'edwin@tryenvoyx.com'
 const DEFAULT_FROM = 'ifunanya@tryenvoyx.com'
 const DEFAULT_REPLY_TO = 'ifunanya@tryenvoyx.com'
 const ALGORITHM = 'aes-256-gcm'
