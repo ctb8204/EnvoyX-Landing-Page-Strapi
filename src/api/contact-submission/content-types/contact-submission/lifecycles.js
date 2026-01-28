@@ -119,10 +119,21 @@ const sendContactEmail = async (result) => {
       replyTo: DEFAULT_REPLY_TO
     })
   } catch (error) {
-    const details =
-      error && typeof error === 'object'
-        ? (error.response && error.response.data) || error.message || 'Unknown email error'
-        : 'Unknown email error'
+    const responseData = error && typeof error === 'object' ? error.response?.data : null
+    const responseStatus = error && typeof error === 'object' ? error.response?.status : null
+    let details = 'Unknown email error'
+
+    if (responseData) {
+      details =
+        typeof responseData === 'string' ? responseData : JSON.stringify(responseData)
+    } else if (error && typeof error === 'object' && error.message) {
+      details = error.message
+    }
+
+    if (responseStatus) {
+      details = `status ${responseStatus}: ${details}`
+    }
+
     strapi.log.error(`Failed to send contact email: ${details}`)
   }
 }
@@ -130,10 +141,21 @@ const sendContactEmail = async (result) => {
 const scheduleContactEmail = (result) => {
   setImmediate(() => {
     sendContactEmail(result).catch((error) => {
-      const details =
-        error && typeof error === 'object'
-          ? (error.response && error.response.data) || error.message || 'Unknown email error'
-          : 'Unknown email error'
+      const responseData = error && typeof error === 'object' ? error.response?.data : null
+      const responseStatus = error && typeof error === 'object' ? error.response?.status : null
+      let details = 'Unknown email error'
+
+      if (responseData) {
+        details =
+          typeof responseData === 'string' ? responseData : JSON.stringify(responseData)
+      } else if (error && typeof error === 'object' && error.message) {
+        details = error.message
+      }
+
+      if (responseStatus) {
+        details = `status ${responseStatus}: ${details}`
+      }
+
       strapi.log.error(`Failed to schedule contact email: ${details}`)
     })
   })
