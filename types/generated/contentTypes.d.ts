@@ -614,7 +614,7 @@ export interface ApiContactSubmissionContactSubmission
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     email: Schema.Attribute.Email & Schema.Attribute.Required;
-    encryptedPayload: Schema.Attribute.Text & Schema.Attribute.Required;
+    encryptedPayload: Schema.Attribute.Text;
     fullName: Schema.Attribute.String & Schema.Attribute.Required;
     helpRequest: Schema.Attribute.Text & Schema.Attribute.Required;
     jobTitle: Schema.Attribute.String & Schema.Attribute.Required;
