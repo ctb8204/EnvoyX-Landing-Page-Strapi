@@ -56,13 +56,27 @@ const parseRecipients = (value) => {
   }
 
   if (Array.isArray(value)) {
-    return value.map((entry) => String(entry).trim()).filter(Boolean)
+    return value
+      .map((entry) => normalizeRecipient(String(entry)))
+      .filter(Boolean)
   }
 
   return String(value)
     .split(/[\n,]+/)
-    .map((entry) => entry.trim())
+    .map((entry) => normalizeRecipient(entry))
     .filter(Boolean)
+}
+
+const normalizeRecipient = (value) => {
+  const trimmed = value.trim()
+  if (!trimmed) return ''
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim()
+  }
+  return trimmed
 }
 
 const loadRecipients = async () => {
@@ -97,6 +111,7 @@ const sendContactEmail = async (result) => {
 
   const recipients = await loadRecipients()
   const subject = `New Contact Submission — ${result.fullName}`
+  const to = recipients.length === 1 ? recipients[0] : recipients.join(', ')
 
   const lines = [
     `Full Name: ${result.fullName}`,
@@ -112,7 +127,7 @@ const sendContactEmail = async (result) => {
 
   try {
     await emailService.send({
-      to: recipients,
+      to,
       subject,
       text: lines.join('\n'),
       from: DEFAULT_FROM,
