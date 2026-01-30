@@ -47,6 +47,66 @@ module.exports = {
           auth: false,
         },
       },
+      {
+        method: 'GET',
+        path: '/email/test',
+        async handler(ctx) {
+          const secret = process.env.EMAIL_TEST_SECRET;
+          if (secret && ctx.query.secret !== secret) {
+            ctx.status = 401;
+            ctx.body = { ok: false, message: 'Unauthorized' };
+            return;
+          }
+
+          const emailService = strapi.plugin('email')?.service('email');
+          if (!emailService) {
+            ctx.status = 500;
+            ctx.body = { ok: false, message: 'Email plugin not configured' };
+            return;
+          }
+
+          const to = String(ctx.query.to || process.env.EMAIL_TEST_TO || '').trim();
+          if (!to) {
+            ctx.status = 400;
+            ctx.body = { ok: false, message: 'Missing "to" query param' };
+            return;
+          }
+
+          try {
+            await emailService.send({
+              to,
+              subject: 'EnvoyX email test',
+              text: 'This is a test email from Strapi.'
+            });
+            ctx.body = { ok: true, to };
+          } catch (error) {
+            const responseData =
+              error && typeof error === 'object' ? error.response?.data : null;
+            const responseStatus =
+              error && typeof error === 'object' ? error.response?.status : null;
+            let details = 'Unknown email error';
+
+            if (responseData) {
+              details =
+                typeof responseData === 'string'
+                  ? responseData
+                  : JSON.stringify(responseData);
+            } else if (error && typeof error === 'object' && error.message) {
+              details = error.message;
+            }
+
+            if (responseStatus) {
+              details = `status ${responseStatus}: ${details}`;
+            }
+
+            ctx.status = 500;
+            ctx.body = { ok: false, message: details };
+          }
+        },
+        config: {
+          auth: false,
+        },
+      },
     ]);
   },
 
