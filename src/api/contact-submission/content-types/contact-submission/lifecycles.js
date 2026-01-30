@@ -1,8 +1,14 @@
 const crypto = require('node:crypto')
 
 const DEFAULT_RECIPIENT = 'edwin@tryenvoyx.com'
-const DEFAULT_FROM = 'ifunanya@tryenvoyx.com'
-const DEFAULT_REPLY_TO = 'ifunanya@tryenvoyx.com'
+const DEFAULT_FROM =
+  process.env.EMAIL_DEFAULT_FROM ||
+  process.env.EMAIL_SENDER ||
+  'no-reply@tryenvoyx.com'
+const DEFAULT_REPLY_TO =
+  process.env.EMAIL_DEFAULT_REPLY_TO ||
+  process.env.EMAIL_REPLY_TO ||
+  DEFAULT_FROM
 const ALGORITHM = 'aes-256-gcm'
 const IV_LENGTH = 12
 
@@ -50,6 +56,8 @@ const ensureEncryptedPayload = (data) => {
   data.encryptedPayload = encryptString(buildFallbackPayload(data))
 }
 
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 const parseRecipients = (value) => {
   if (!value) {
     return []
@@ -59,17 +67,39 @@ const parseRecipients = (value) => {
     return value
       .map((entry) => normalizeRecipient(String(entry)))
       .filter(Boolean)
+      .filter((entry) => emailPattern.test(entry))
   }
 
-  return String(value)
-    .split(/[\n,]+/)
+  const raw = String(value).trim()
+  if (!raw) return []
+
+  if (raw.startsWith('[') && raw.endsWith(']')) {
+    try {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map((entry) => normalizeRecipient(String(entry)))
+          .filter(Boolean)
+          .filter((entry) => emailPattern.test(entry))
+      }
+    } catch (error) {
+      // fall through to delimiter parsing
+    }
+  }
+
+  return raw
+    .split(/[\n,;]+/)
     .map((entry) => normalizeRecipient(entry))
     .filter(Boolean)
+    .filter((entry) => emailPattern.test(entry))
 }
 
 const normalizeRecipient = (value) => {
-  const trimmed = value.trim()
+  let trimmed = value.trim()
   if (!trimmed) return ''
+  if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+    trimmed = trimmed.slice(1, -1).trim()
+  }
   if (
     (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
     (trimmed.startsWith("'") && trimmed.endsWith("'"))
@@ -111,7 +141,7 @@ const sendContactEmail = async (result) => {
 
   const recipients = await loadRecipients()
   const subject = `New Contact Submission — ${result.fullName}`
-  const to = recipients.length === 1 ? recipients[0] : recipients.join(', ')
+  const to = recipients.length === 1 ? recipients[0] : recipients.join(',')
 
   const lines = [
     `Full Name: ${result.fullName}`,

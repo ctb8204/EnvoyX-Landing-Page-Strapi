@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_shared_htmls",
+  "info": {
+    "displayName": "HTML",
+    "icon": "code"
+  },
+  "options": {},
+  "attributes": {
+    "HTML": {
+      "type": "customField",
+      "customField": "plugin::ckeditor5.CKEditor",
+      "options": {
+        "preset": "defaultHtml"
+      }
+    }
+  },
+  "config": {}
+}
