@@ -67,6 +67,7 @@ const parseRecipients = (value) => {
     return value
       .map((entry) => normalizeRecipient(String(entry)))
       .filter(Boolean)
+<<<<<<< HEAD
       .filter((entry) => emailPattern.test(entry))
   }
 
@@ -89,6 +90,12 @@ const parseRecipients = (value) => {
 
   return raw
     .split(/[\n,;]+/)
+=======
+  }
+
+  return String(value)
+    .split(/[\n,]+/)
+>>>>>>> 1064c3b (Email field fixes)
     .map((entry) => normalizeRecipient(entry))
     .filter(Boolean)
     .filter((entry) => emailPattern.test(entry))
@@ -100,6 +107,18 @@ const normalizeRecipient = (value) => {
   if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
     trimmed = trimmed.slice(1, -1).trim()
   }
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.slice(1, -1).trim()
+  }
+  return trimmed
+}
+
+const normalizeRecipient = (value) => {
+  const trimmed = value.trim()
+  if (!trimmed) return ''
   if (
     (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
     (trimmed.startsWith("'") && trimmed.endsWith("'"))
@@ -141,7 +160,11 @@ const sendContactEmail = async (result) => {
 
   const recipients = await loadRecipients()
   const subject = `New Contact Submission — ${result.fullName}`
+<<<<<<< HEAD
   const to = recipients.length === 1 ? recipients[0] : recipients.join(',')
+=======
+  const to = recipients.length === 1 ? recipients[0] : recipients.join(', ')
+>>>>>>> 1064c3b (Email field fixes)
 
   const lines = [
     `Full Name: ${result.fullName}`,
