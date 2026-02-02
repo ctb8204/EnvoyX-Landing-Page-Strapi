@@ -1,8 +1,34 @@
 module.exports = ({ env }) => {
-  const provider = env(
-    'EMAIL_PROVIDER',
-    env('SMTP_HOST') ? 'nodemailer' : 'sendmail'
-  );
+  const explicitProvider = env('EMAIL_PROVIDER');
+  const hasSmtp = Boolean(env('SMTP_HOST'));
+  let provider = explicitProvider || (hasSmtp ? 'nodemailer' : 'sendmail');
+
+  const resolveProvider = (name) => {
+    try {
+      require.resolve(`@strapi/provider-email-${name}`);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  if (explicitProvider === 'sendgrid' && hasSmtp) {
+    // Prefer nodemailer when SMTP settings are present.
+    provider = 'nodemailer';
+    // eslint-disable-next-line no-console
+    console.warn(
+      '[email] EMAIL_PROVIDER=sendgrid ignored because SMTP_HOST is set. Using nodemailer.'
+    );
+  }
+
+  if (!resolveProvider(provider)) {
+    const fallback = hasSmtp ? 'nodemailer' : 'sendmail';
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[email] Provider "${provider}" not found. Falling back to "${fallback}".`
+    );
+    provider = fallback;
+  }
 
   const smtpPort = env.int('SMTP_PORT', 587);
   const smtpSecure = env.bool('SMTP_SECURE', smtpPort === 465);
@@ -36,6 +62,9 @@ module.exports = ({ env }) => {
     env('EMAIL_DEFAULT_REPLY_TO') || env('EMAIL_REPLY_TO') || defaultFrom;
 
   return {
+    ckeditor5: {
+      enabled: true,
+    },
     email: {
       config: {
         provider,
