@@ -54,6 +54,26 @@ yarn strapi deploy
 - Local preview (free tier friendly): run Strapi locally and point the landing app’s
   `STRAPI_URL` to your local instance for testing.
 
+### Newsletter
+- Public endpoints:
+  - `POST /api/newsletter/subscribe`
+  - `POST /api/newsletter/unsubscribe`
+- Issue endpoints:
+  - `GET /api/newsletter-issues/:documentId/preview`
+  - `POST /api/newsletter-issues/:documentId/send-test`
+  - `POST /api/newsletter-issues/:documentId/send`
+- Import fundraiser contacts from the provided CSV:
+
+```bash
+npm run newsletter:import
+```
+
+- Dry-run the import without writing subscribers:
+
+```bash
+npm run newsletter:import -- --dry-run
+```
+
 ## 📚 Learn more
 
 - [Resource center](https://strapi.io/resource-center) - Strapi resource center.

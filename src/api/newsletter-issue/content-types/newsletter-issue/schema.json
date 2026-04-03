@@ -1,0 +1,75 @@
+{
+  "kind": "collectionType",
+  "collectionName": "newsletter_issues",
+  "info": {
+    "singularName": "newsletter-issue",
+    "pluralName": "newsletter-issues",
+    "displayName": "Newsletter Issue",
+    "description": "Monthly newsletter digest content"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "subject": {
+      "type": "string",
+      "required": true
+    },
+    "preheader": {
+      "type": "text"
+    },
+    "issueDate": {
+      "type": "date"
+    },
+    "headerImage": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "intro": {
+      "type": "text"
+    },
+    "featuredArticles": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::article.article"
+    },
+    "productUpdateTitle": {
+      "type": "string"
+    },
+    "productUpdateBody": {
+      "type": "text"
+    },
+    "ecosystemInsightTitle": {
+      "type": "string"
+    },
+    "ecosystemInsightBody": {
+      "type": "text"
+    },
+    "ctaLabel": {
+      "type": "string"
+    },
+    "ctaUrl": {
+      "type": "string"
+    },
+    "sentAt": {
+      "type": "datetime"
+    },
+    "lastTestSentAt": {
+      "type": "datetime"
+    }
+  }
+}
