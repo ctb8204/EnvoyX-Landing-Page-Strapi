@@ -14,10 +14,11 @@
   },
   "dependencies": {
     "@_sh/strapi-plugin-ckeditor": "^7.0.0",
-    "@strapi/plugin-cloud": "5.33.4",
-    "@strapi/plugin-users-permissions": "5.33.4",
+    "@strapi/design-system": "2.2.0",
+    "@strapi/plugin-cloud": "5.41.1",
+    "@strapi/plugin-users-permissions": "5.41.1",
     "@strapi/provider-email-nodemailer": "^5.33.4",
-    "@strapi/strapi": "5.33.4",
+    "@strapi/strapi": "5.41.1",
     "better-sqlite3": "11.3.0",
     "fs-extra": "^10.0.0",
     "mime-types": "^2.1.27",
@@ -28,6 +29,9 @@
     "sendgrid": "^5.2.3",
     "strapi-plugin-preview-button": "^3.0.2",
     "styled-components": "^6.0.0"
+  },
+  "overrides": {
+    "@strapi/design-system": "2.2.0"
   },
   "engines": {
     "node": ">=18.0.0 <=22.x.x",
