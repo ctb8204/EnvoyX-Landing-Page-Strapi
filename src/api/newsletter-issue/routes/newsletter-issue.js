@@ -5,7 +5,10 @@ module.exports = {
     {
       method: 'GET',
       path: '/newsletter-issues/:documentId/preview',
-      handler: 'newsletter-issue.preview'
+      handler: 'newsletter-issue.preview',
+      config: {
+        auth: false
+      }
     },
     {
       method: 'POST',

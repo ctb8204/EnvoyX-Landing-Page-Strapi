@@ -3,8 +3,37 @@
 module.exports = {
   async preview(ctx) {
     try {
+      const configuredSecret = process.env.PREVIEW_SECRET || 'your-preview-secret-token'
+      const requestSecret = String(ctx.query.secret || '').trim()
+      const documentId = String(ctx.params.documentId || '').trim()
+
+      if (!documentId) {
+        ctx.status = 400
+        ctx.body = {
+          ok: false,
+          message: 'Missing newsletter issue documentId.'
+        }
+        return
+      }
+
+      if (!requestSecret || requestSecret !== configuredSecret) {
+        ctx.status = 401
+        ctx.body = {
+          ok: false,
+          message: 'Invalid preview secret.'
+        }
+        return
+      }
+
       const service = strapi.service('api::newsletter-issue.newsletter-issue')
-      const result = await service.previewIssue(ctx.params.documentId)
+      const result = await service.previewIssue(documentId)
+
+      if (String(ctx.query.format || '').trim().toLowerCase() === 'html') {
+        ctx.type = 'html'
+        ctx.body = result.html
+        return
+      }
+
       ctx.body = {
         ok: true,
         ...result

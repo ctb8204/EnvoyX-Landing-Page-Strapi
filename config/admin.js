@@ -55,6 +55,28 @@ module.exports = ({ env }) => ({
         }
       }
 
+      if (uid === 'api::newsletter-issue.newsletter-issue') {
+        try {
+          const document = await strapi.documents(uid).findOne({
+            documentId,
+            status
+          });
+
+          if (!document || !document.documentId) {
+            console.warn(`Preview: Newsletter issue ${documentId} not found`);
+            return null;
+          }
+
+          const previewUrl = new URL('/en/newsletter/preview', baseUrl);
+          previewUrl.searchParams.set('secret', secret);
+          previewUrl.searchParams.set('documentId', document.documentId);
+          return previewUrl.toString();
+        } catch (error) {
+          console.error('Newsletter preview handler error:', error);
+          return null;
+        }
+      }
+
       // For other content types, return null (no preview available)
       return null;
     },
