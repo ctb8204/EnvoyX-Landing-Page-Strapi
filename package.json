@@ -4,7 +4,9 @@
   "private": true,
   "description": "A Strapi application",
   "scripts": {
+    "audit:instance": "node ./scripts/audit-instance-health.js",
     "build": "strapi build",
+    "content:import:envoyx": "node ./scripts/import-envoyx-content.js",
     "deploy": "strapi deploy",
     "develop": "strapi develop",
     "newsletter:import": "node ./scripts/import-newsletter-subscribers.js",

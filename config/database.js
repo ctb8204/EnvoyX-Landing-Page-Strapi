@@ -1,7 +1,20 @@
 const path = require('path');
 
 module.exports = ({ env }) => {
-  const client = env('DATABASE_CLIENT', 'sqlite');
+  const explicitClient = env('DATABASE_CLIENT');
+  const hasConnectionString = Boolean(env('DATABASE_URL'));
+  const hasDatabaseHost = Boolean(env('DATABASE_HOST'));
+  const inferredClient = hasConnectionString
+    ? env('DATABASE_URL', '').startsWith('mysql')
+      ? 'mysql'
+      : 'postgres'
+    : hasDatabaseHost
+      ? env.int('DATABASE_PORT', 5432) === 3306
+        ? 'mysql'
+        : 'postgres'
+      : 'sqlite';
+  const client =
+    explicitClient || inferredClient;
   const isProd = env('NODE_ENV') === 'production';
   const sqliteFilename = path.join(__dirname, '..', env('DATABASE_FILENAME', '.tmp/data.db'));
 
@@ -19,6 +32,11 @@ module.exports = ({ env }) => {
         database: env('DATABASE_NAME', 'strapi'),
       });
     }
+  } else if (client === 'sqlite') {
+    // eslint-disable-next-line no-console
+    console.warn(
+      '[DB] Production is using sqlite. On Strapi Cloud this is usually the wrong backend and can cause unstable content editing and persistence issues.'
+    );
   }
 
   const connections = {

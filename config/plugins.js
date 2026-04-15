@@ -65,6 +65,11 @@ module.exports = ({ env }) => {
     ckeditor5: {
       enabled: true,
     },
+    upload: {
+      config: {
+        sizeLimit: env.int('UPLOAD_SIZE_LIMIT', 20 * 1024 * 1024),
+      },
+    },
     email: {
       config: {
         provider,

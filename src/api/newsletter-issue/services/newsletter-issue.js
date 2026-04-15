@@ -16,6 +16,20 @@ const {
 
 const uid = 'api::newsletter-issue.newsletter-issue'
 
+const BRAND = {
+  accent: '#66db4a',
+  accentMuted: '#edfbea',
+  bg: '#ffffff',
+  border: '#dfe6e3',
+  card: '#f6f4f1',
+  ink: '#081f24',
+  inkMuted: '#526066',
+  inkSoft: '#274047',
+  shadow: '0 20px 44px rgba(8,31,36,0.08)'
+}
+
+const FONT_STACK = "Arial, 'Helvetica Neue', Helvetica, sans-serif"
+
 const renderArticleCardHtml = (article) => {
   const articleUrl = buildBlogArticleUrl(article.slug)
   const coverUrl = getAbsoluteUrl(article.cover?.url, getStrapiBaseUrl())
@@ -23,29 +37,32 @@ const renderArticleCardHtml = (article) => {
   const publishDate = formatHumanDate(article.publishedAt)
   const excerpt = escapeHtml(getArticleExcerpt(article))
   const title = escapeHtml(article.title)
+  const authorName = article.author?.name ? escapeHtml(article.author.name) : 'EnvoyX'
 
   const imageHtml = coverUrl
     ? `
       <tr>
         <td style="padding:0 0 20px;">
-          <img src="${escapeHtml(coverUrl)}" alt="${title}" style="display:block;width:100%;height:auto;border-radius:16px;" />
+          <img src="${escapeHtml(coverUrl)}" alt="${title}" style="display:block;width:100%;height:auto;border-radius:18px;" />
         </td>
       </tr>
     `
     : ''
 
   return `
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;background:#f6f4f1;border-radius:20px;margin:0 0 24px;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;background:${BRAND.bg};border:1px solid ${BRAND.border};border-radius:24px;margin:0 0 24px;box-shadow:${BRAND.shadow};">
       <tr>
         <td style="padding:24px;">
           ${imageHtml}
-          <div style="margin:0 0 12px;">
-            <span style="display:inline-block;background:#e8ecea;color:#081f24;border-radius:999px;padding:6px 12px;font-family:Arial,sans-serif;font-size:12px;line-height:16px;font-weight:700;letter-spacing:0.02em;text-transform:uppercase;">${categoryName}</span>
+          <div style="margin:0 0 14px;">
+            <span style="display:inline-block;background:${BRAND.accentMuted};color:${BRAND.ink};border-radius:999px;padding:6px 12px;font-family:${FONT_STACK};font-size:10px;line-height:16px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">${categoryName}</span>
           </div>
-          <h2 style="margin:0 0 12px;font-family:Arial,sans-serif;font-size:28px;line-height:34px;color:#081f24;">${title}</h2>
-          ${publishDate ? `<p style="margin:0 0 12px;font-family:Arial,sans-serif;font-size:14px;line-height:20px;color:#526066;">${escapeHtml(publishDate)}</p>` : ''}
-          <p style="margin:0 0 20px;font-family:Arial,sans-serif;font-size:16px;line-height:26px;color:#274047;">${excerpt}</p>
-          <a href="${escapeHtml(articleUrl)}" style="display:inline-block;padding:12px 20px;border-radius:999px;background:#081f24;color:#ffffff;font-family:Arial,sans-serif;font-size:14px;line-height:20px;font-weight:700;text-decoration:none;">Read on the blog</a>
+          <h3 style="margin:0 0 12px;font-family:${FONT_STACK};font-size:28px;line-height:34px;font-weight:500;letter-spacing:-0.03em;color:${BRAND.ink};">${title}</h3>
+          <p style="margin:0 0 14px;font-family:${FONT_STACK};font-size:13px;line-height:20px;letter-spacing:0.02em;color:${BRAND.inkMuted};">
+            ${publishDate ? `${escapeHtml(publishDate)} &nbsp;&nbsp;•&nbsp;&nbsp; ` : ''}${authorName}
+          </p>
+          <p style="margin:0 0 22px;font-family:${FONT_STACK};font-size:16px;line-height:26px;color:${BRAND.inkSoft};">${excerpt}</p>
+          <a href="${escapeHtml(articleUrl)}" style="display:inline-block;padding:12px 18px;border-radius:999px;background:${BRAND.ink};color:${BRAND.bg};font-family:${FONT_STACK};font-size:14px;line-height:20px;font-weight:700;text-decoration:none;">Read article</a>
         </td>
       </tr>
     </table>
@@ -59,11 +76,12 @@ const renderContentBlockHtml = (title, body) => {
   const heading = normalizeString(title) || 'Update'
 
   return `
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;background:#ffffff;border:1px solid #dfe6e3;border-radius:20px;margin:0 0 24px;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;background:${BRAND.bg};border:1px solid ${BRAND.border};border-radius:24px;margin:0 0 24px;box-shadow:${BRAND.shadow};">
       <tr>
-        <td style="padding:24px;">
-          <h3 style="margin:0 0 12px;font-family:Arial,sans-serif;font-size:22px;line-height:28px;color:#081f24;">${escapeHtml(heading)}</h3>
-          <p style="margin:0;font-family:Arial,sans-serif;font-size:16px;line-height:26px;color:#274047;white-space:pre-line;">${escapeHtml(normalizedBody)}</p>
+        <td style="padding:0 24px 24px;">
+          <div style="height:6px;background:${BRAND.accent};border-radius:24px 24px 0 0;margin:0 -24px 22px;"></div>
+          <h3 style="margin:0 0 12px;font-family:${FONT_STACK};font-size:24px;line-height:30px;font-weight:500;letter-spacing:-0.03em;color:${BRAND.ink};">${escapeHtml(heading)}</h3>
+          <p style="margin:0;font-family:${FONT_STACK};font-size:16px;line-height:26px;color:${BRAND.inkSoft};white-space:pre-line;">${escapeHtml(normalizedBody)}</p>
         </td>
       </tr>
     </table>
@@ -136,17 +154,35 @@ module.exports = createCoreService(uid, ({ strapi }) => ({
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <title>${escapeHtml(issue.subject)}</title>
         </head>
-        <body style="margin:0;padding:0;background:#ffffff;">
+        <body style="margin:0;padding:0;background:${BRAND.bg};">
           <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(preheader)}</div>
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#ffffff;border-collapse:collapse;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:${BRAND.bg};border-collapse:collapse;">
             <tr>
-              <td align="center" style="padding:32px 16px;">
+              <td align="center" style="padding:24px 16px 40px;">
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:720px;border-collapse:collapse;">
                   <tr>
                     <td style="padding:0 0 24px;">
-                      <p style="margin:0 0 12px;font-family:Arial,sans-serif;font-size:14px;line-height:20px;color:#526066;letter-spacing:0.06em;text-transform:uppercase;">EnvoyX Monthly Update</p>
-                      <h1 style="margin:0 0 16px;font-family:Arial,sans-serif;font-size:42px;line-height:48px;color:#081f24;">${escapeHtml(issue.title)}</h1>
-                      ${issueDate ? `<p style="margin:0;font-family:Arial,sans-serif;font-size:16px;line-height:24px;color:#526066;">${escapeHtml(issueDate)}</p>` : ''}
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;background:${BRAND.ink};border-radius:32px;overflow:hidden;">
+                        <tr>
+                          <td style="padding:32px 32px 20px;background:linear-gradient(180deg, ${BRAND.ink} 0%, #123038 100%);">
+                            <span style="display:inline-block;margin:0 0 18px;background:${BRAND.accentMuted};color:${BRAND.ink};border-radius:999px;padding:6px 12px;font-family:${FONT_STACK};font-size:10px;line-height:16px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">EnvoyX investor connection</span>
+                            <h1 style="margin:0 0 14px;font-family:${FONT_STACK};font-size:46px;line-height:50px;font-weight:500;letter-spacing:-0.04em;color:${BRAND.bg};">${escapeHtml(issue.title)}</h1>
+                            ${issueDate ? `<p style="margin:0 0 18px;font-family:${FONT_STACK};font-size:14px;line-height:20px;letter-spacing:0.05em;text-transform:uppercase;color:#bed0d3;">${escapeHtml(issueDate)}</p>` : ''}
+                            <p style="margin:0;font-family:${FONT_STACK};font-size:17px;line-height:28px;color:#eef4f1;">${escapeHtml(preheader)}</p>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding:0 32px 32px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;background:${BRAND.bg};border-radius:24px;">
+                              <tr>
+                                <td style="padding:18px 20px;">
+                                  <p style="margin:0;font-family:${FONT_STACK};font-size:15px;line-height:24px;color:${BRAND.inkSoft};">A monthly view into product progress, financing momentum, and the operating decisions shaping EnvoyX.</p>
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      </table>
                     </td>
                   </tr>
                   ${
@@ -154,7 +190,7 @@ module.exports = createCoreService(uid, ({ strapi }) => ({
                       ? `
                     <tr>
                       <td style="padding:0 0 24px;">
-                        <img src="${escapeHtml(headerImageUrl)}" alt="${escapeHtml(issue.title)}" style="display:block;width:100%;height:auto;border-radius:24px;" />
+                        <img src="${escapeHtml(headerImageUrl)}" alt="${escapeHtml(issue.title)}" style="display:block;width:100%;height:auto;border-radius:28px;" />
                       </td>
                     </tr>
                   `
@@ -165,10 +201,11 @@ module.exports = createCoreService(uid, ({ strapi }) => ({
                       ? `
                     <tr>
                       <td style="padding:0 0 24px;">
-                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;background:#f6f4f1;border-radius:24px;">
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;background:${BRAND.card};border-radius:28px;">
                           <tr>
-                            <td style="padding:28px;">
-                              <p style="margin:0;font-family:Arial,sans-serif;font-size:18px;line-height:30px;color:#274047;">${escapeHtml(intro)}</p>
+                            <td style="padding:28px 28px 30px;">
+                              <p style="margin:0 0 12px;font-family:${FONT_STACK};font-size:11px;line-height:16px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${BRAND.inkMuted};">Letter from EnvoyX</p>
+                              <p style="margin:0;font-family:${FONT_STACK};font-size:19px;line-height:31px;color:${BRAND.inkSoft};">${escapeHtml(intro)}</p>
                             </td>
                           </tr>
                         </table>
@@ -182,7 +219,7 @@ module.exports = createCoreService(uid, ({ strapi }) => ({
                       ? `
                     <tr>
                       <td style="padding:0 0 8px;">
-                        <h2 style="margin:0 0 16px;font-family:Arial,sans-serif;font-size:28px;line-height:34px;color:#081f24;">From the blog</h2>
+                        <h2 style="margin:0 0 16px;font-family:${FONT_STACK};font-size:30px;line-height:34px;font-weight:500;letter-spacing:-0.03em;color:${BRAND.ink};">From the blog</h2>
                       </td>
                     </tr>
                     <tr>
@@ -196,7 +233,7 @@ module.exports = createCoreService(uid, ({ strapi }) => ({
                       ? `
                     <tr>
                       <td style="padding:8px 0 8px;">
-                        <h2 style="margin:0 0 16px;font-family:Arial,sans-serif;font-size:28px;line-height:34px;color:#081f24;">Highlights</h2>
+                        <h2 style="margin:0 0 16px;font-family:${FONT_STACK};font-size:30px;line-height:34px;font-weight:500;letter-spacing:-0.03em;color:${BRAND.ink};">Highlights</h2>
                         ${productUpdateHtml}
                         ${ecosystemInsightHtml}
                       </td>
@@ -205,15 +242,23 @@ module.exports = createCoreService(uid, ({ strapi }) => ({
                       : ''
                   }
                   <tr>
-                    <td style="padding:16px 0 32px;text-align:left;">
-                      <a href="${escapeHtml(ctaUrl)}" style="display:inline-block;padding:14px 24px;border-radius:999px;background:#081f24;color:#ffffff;font-family:Arial,sans-serif;font-size:16px;line-height:22px;font-weight:700;text-decoration:none;">${escapeHtml(ctaLabel)}</a>
+                    <td style="padding:16px 0 32px;">
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:separate;background:${BRAND.accentMuted};border-radius:28px;">
+                        <tr>
+                          <td style="padding:26px 28px;" align="left">
+                            <p style="margin:0 0 10px;font-family:${FONT_STACK};font-size:11px;line-height:16px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${BRAND.inkMuted};">Next step</p>
+                            <p style="margin:0 0 18px;font-family:${FONT_STACK};font-size:18px;line-height:28px;color:${BRAND.ink};">Keep the conversation moving with the EnvoyX team.</p>
+                            <a href="${escapeHtml(ctaUrl)}" style="display:inline-block;padding:14px 24px;border-radius:999px;background:${BRAND.ink};color:${BRAND.bg};font-family:${FONT_STACK};font-size:15px;line-height:22px;font-weight:700;text-decoration:none;">${escapeHtml(ctaLabel)}</a>
+                          </td>
+                        </tr>
+                      </table>
                     </td>
                   </tr>
                   <tr>
-                    <td style="padding:24px 0 0;border-top:1px solid #dfe6e3;">
-                      <p style="margin:0 0 8px;font-family:Arial,sans-serif;font-size:13px;line-height:20px;color:#6d7a7f;">You are receiving this email because you are on the EnvoyX update list.</p>
-                      <p style="margin:0;font-family:Arial,sans-serif;font-size:13px;line-height:20px;color:#6d7a7f;">
-                        <a href="${escapeHtml(unsubscribeUrl)}" style="color:#081f24;text-decoration:underline;">Unsubscribe</a>
+                    <td style="padding:24px 0 0;border-top:1px solid ${BRAND.border};">
+                      <p style="margin:0 0 8px;font-family:${FONT_STACK};font-size:13px;line-height:20px;color:${BRAND.inkMuted};">You are receiving this email because you are on the EnvoyX update list.</p>
+                      <p style="margin:0;font-family:${FONT_STACK};font-size:13px;line-height:20px;color:${BRAND.inkMuted};">
+                        <a href="${escapeHtml(unsubscribeUrl)}" style="color:${BRAND.ink};text-decoration:underline;">Unsubscribe</a>
                       </p>
                     </td>
                   </tr>

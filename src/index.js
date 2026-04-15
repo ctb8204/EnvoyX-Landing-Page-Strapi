@@ -1,5 +1,6 @@
 'use strict';
 const bootstrap = require("./bootstrap");
+const createNewsletterAdminRoutes = require('./newsletter-admin-routes');
 
 module.exports = {
   /**
@@ -108,6 +109,8 @@ module.exports = {
         },
       },
     ]);
+
+    strapi.server.routes(createNewsletterAdminRoutes({ strapi }));
   },
 
   /**

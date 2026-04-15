@@ -1,3 +1,5 @@
+const normalizeOrigin = (value) => String(value || '').trim().replace(/\/+$/, '')
+
 module.exports = ({ env }) => ({
   secrets: {
     encryptionKey: env('ENCRYPTION_KEY'),
@@ -20,12 +22,23 @@ module.exports = ({ env }) => ({
   preview: {
     enabled: true,
     config: {
-      allowedOrigins: env('PREVIEW_ALLOWED_ORIGINS', env('CLIENT_URL', 'http://localhost:3000'))
-        .split(',')
-        .map((origin) => origin.trim())
-        .filter(Boolean),
+      allowedOrigins: Array.from(
+        new Set(
+          [
+            ...String(
+              env('PREVIEW_ALLOWED_ORIGINS', env('CLIENT_URL', 'http://localhost:3000'))
+            ).split(','),
+            env('CLIENT_URL', 'http://localhost:3000'),
+            env('PREVIEW_BASE_URL', env('CLIENT_URL', 'http://localhost:3000')),
+            env('STRAPI_PUBLIC_URL', env('PUBLIC_URL', 'http://localhost:1337')),
+          ]
+            .map(normalizeOrigin)
+            .filter(Boolean)
+        )
+      ),
       async handler(uid, { documentId, locale, status }) {
-        const baseUrl = env('PREVIEW_BASE_URL', env('CLIENT_URL', 'http://localhost:3000'));
+        const frontendBaseUrl = env('PREVIEW_BASE_URL', env('CLIENT_URL', 'http://localhost:3000'));
+        const strapiBaseUrl = env('STRAPI_PUBLIC_URL', env('PUBLIC_URL', 'http://localhost:1337'));
         const secret = env('PREVIEW_SECRET', 'your-preview-secret-token');
 
         if (uid === 'api::article.article') {
@@ -41,12 +54,15 @@ module.exports = ({ env }) => ({
               return null;
             }
 
-            const previewUrl = new URL('/api/preview', baseUrl);
-            previewUrl.searchParams.set('secret', secret);
-            previewUrl.searchParams.set('slug', document.slug);
+            const previewUrl = new URL(
+              `/api/articles/${encodeURIComponent(document.documentId)}/preview`,
+              strapiBaseUrl
+            )
+            previewUrl.searchParams.set('secret', secret)
+            previewUrl.searchParams.set('status', status || 'draft')
 
             if (locale) {
-              previewUrl.searchParams.set('locale', locale);
+              previewUrl.searchParams.set('locale', locale)
             }
 
             return previewUrl.toString();
@@ -68,7 +84,7 @@ module.exports = ({ env }) => ({
               return null;
             }
 
-            const previewUrl = new URL('/en/newsletter/preview', baseUrl);
+            const previewUrl = new URL('/en/newsletter/preview', frontendBaseUrl);
             previewUrl.searchParams.set('secret', secret);
             previewUrl.searchParams.set('documentId', document.documentId);
             return previewUrl.toString();
