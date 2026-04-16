@@ -7,6 +7,7 @@ const createResponseBody = (ok, data = {}) => ({
 
 module.exports = ({ strapi }) => ({
   type: 'admin',
+  prefix: '/admin',
   routes: [
     {
       method: 'POST',
